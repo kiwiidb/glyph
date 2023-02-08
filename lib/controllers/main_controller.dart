@@ -2,7 +2,12 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:glyph/models/utxo.dart';
+import 'package:crypto/crypto.dart';
+import 'package:convert/convert.dart';
+import 'package:pointycastle/ecc/api.dart';
 import 'package:http/http.dart' as http;
+
+import 'helpers.dart';
 
 class MainControlller extends GetxController {
   var pubkey =
@@ -17,6 +22,21 @@ class MainControlller extends GetxController {
     super.onInit();
     utxos.value = await fetchUtxos(receiveAddress);
     loading.value = false;
+  }
+
+  String getAddressFromPubkey(String pubkey) {
+    //damn I don't know what I'm doing
+    var pubkeyBytes = hex.decode(pubkey);
+    var result = sha256.convert(pubkeyBytes);
+    BigInt x = bigFromBytes(hex.decode(pubkey.padLeft(64, '0')));
+    BigInt y;
+    try {
+      y = liftX(x);
+    } on Error {
+      throw Error();
+    }
+    ECPoint P = secp256k1.curve.createPoint(x, y);
+    return "";
   }
 
   Future<List<Utxo>> fetchUtxos(String address) async {
