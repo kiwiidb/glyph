@@ -1,42 +1,37 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:glyph/models/utxo.dart';
-import 'package:crypto/crypto.dart';
 import 'package:convert/convert.dart';
-import 'package:pointycastle/ecc/api.dart';
+import 'package:dart_bech32/dart_bech32.dart';
+import 'package:glyph/models/utxo.dart';
 import 'package:http/http.dart' as http;
-
-import 'helpers.dart';
 
 class MainControlller extends GetxController {
   var pubkey =
       "npub13sajvl5ak6cpz4ycesl0e5v869r5sey5pt50l9mcy6uas0fqtpmscth4np";
-  var receiveAddress =
-      "bc1p3sajvl5ak6cpz4ycesl0e5v869r5sey5pt50l9mcy6uas0fqtpmsmtt7mr";
+  var bumiPubkey =
+      "npub1xv8mzscll8vvy5rsdw7dcqtd2j268a6yupr6gzqh86f2ulhy9kkqmclk3x";
   var utxos = List<Utxo>.empty().obs;
   var loading = true.obs;
 
   @override
   void onInit() async {
     super.onInit();
-    utxos.value = await fetchUtxos(receiveAddress);
+    var p2trAddress = getAddressFromPubkey(bumiPubkey);
+    utxos.value = await fetchUtxos(p2trAddress);
+    getAddressFromPubkey(pubkey);
     loading.value = false;
   }
 
   String getAddressFromPubkey(String pubkey) {
     //damn I don't know what I'm doing
-    var pubkeyBytes = hex.decode(pubkey);
-    var result = sha256.convert(pubkeyBytes);
-    BigInt x = bigFromBytes(hex.decode(pubkey.padLeft(64, '0')));
-    BigInt y;
-    try {
-      y = liftX(x);
-    } on Error {
-      throw Error();
-    }
-    ECPoint P = secp256k1.curve.createPoint(x, y);
-    return "";
+    var decoded = bech32.decode(pubkey);
+    var newList = List<int>.from(decoded.words);
+    newList.insert(0, 1);
+    var newWords = Uint8List.fromList(newList);
+    var encoded = bech32m.encode(Decoded(prefix: "bc", words: newWords));
+    return encoded;
   }
 
   Future<List<Utxo>> fetchUtxos(String address) async {
@@ -54,4 +49,30 @@ class MainControlller extends GetxController {
   String getImageUrl(Utxo utxo) {
     return 'https://ordinals.com/content/${utxo.txid}i${utxo.vout}';
   }
+}
+
+List<int> _convertBits(List<int> data, int from, int to, bool pad) {
+  var acc = 0;
+  var bits = 0;
+  var result = <int>[];
+  var maxv = (1 << to) - 1;
+
+  data.forEach((v) {
+    if (v < 0 || (v >> from) != 0) {
+      throw Exception();
+    }
+    acc = (acc << from) | v;
+    bits += from;
+    while (bits >= to) {
+      bits -= to;
+      result.add((acc >> bits) & maxv);
+    }
+  });
+
+  if (pad) {
+    if (bits > 0) {
+      result.add((acc << (to - bits)) & maxv);
+    }
+  }
+  return result;
 }

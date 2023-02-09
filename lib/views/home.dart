@@ -25,8 +25,6 @@ class Home extends StatelessWidget {
           }),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
           ),
         );
       }),
