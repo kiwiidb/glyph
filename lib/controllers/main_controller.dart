@@ -13,6 +13,7 @@ import 'package:nostr/nostr.dart';
 class MainControlller extends GetxController {
   final TextEditingController pubkeyController = TextEditingController();
   var utxos = List<Utxo>.empty().obs;
+  var contacts = <String, String>{}.obs;
   var loading = true.obs;
 
   @override
@@ -65,7 +66,7 @@ class MainControlller extends GetxController {
 
     // Connecting to a nostr relay using websocket
     WebSocket webSocket = await WebSocket.connect(
-      'wss://brb.io', // or any nostr relay
+      'wss://relay.damus.io', // or any nostr relay
     );
     // if the current socket fail try another one
     // wss://nostr.sandwich.farm
@@ -78,8 +79,11 @@ class MainControlller extends GetxController {
     print("started listening..");
     await Future.delayed(Duration(seconds: 1));
     webSocket.listen((event) {
-      var parsed = Message.deserialize(event) as Event;
-      print('Received event: ${parsed.tags}');
+      var parsed = Message.deserialize(event).message as Event;
+      contacts.clear();
+      for (var tag in parsed.tags) {
+        contacts[tag[1]] = "";
+      }
     });
 
     // Close the WebSocket connection
