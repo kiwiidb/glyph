@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:convert/convert.dart';
 import 'package:dart_bech32/dart_bech32.dart';
@@ -8,21 +9,9 @@ import 'package:glyph/models/utxo.dart';
 import 'package:http/http.dart' as http;
 
 class MainControlller extends GetxController {
-  var pubkey =
-      "npub13sajvl5ak6cpz4ycesl0e5v869r5sey5pt50l9mcy6uas0fqtpmscth4np";
-  var bumiPubkey =
-      "npub1xv8mzscll8vvy5rsdw7dcqtd2j268a6yupr6gzqh86f2ulhy9kkqmclk3x";
+  final TextEditingController pubkeyController = TextEditingController();
   var utxos = List<Utxo>.empty().obs;
   var loading = true.obs;
-
-  @override
-  void onInit() async {
-    super.onInit();
-    var p2trAddress = getAddressFromPubkey(bumiPubkey);
-    utxos.value = await fetchUtxos(p2trAddress);
-    getAddressFromPubkey(pubkey);
-    loading.value = false;
-  }
 
   String getAddressFromPubkey(String pubkey) {
     //damn I don't know what I'm doing
@@ -32,6 +21,11 @@ class MainControlller extends GetxController {
     var newWords = Uint8List.fromList(newList);
     var encoded = bech32m.encode(Decoded(prefix: "bc", words: newWords));
     return encoded;
+  }
+
+  void fetchInscriptions() async {
+    var p2tr = getAddressFromPubkey(pubkeyController.text);
+    utxos.value = await fetchUtxos(p2tr);
   }
 
   Future<List<Utxo>> fetchUtxos(String address) async {
