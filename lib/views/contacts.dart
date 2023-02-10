@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
@@ -17,17 +16,17 @@ class ContactPage extends StatelessWidget {
           const SizedBox(
             height: 80,
           ),
-          Text(controller.contacts.length.toString()),
+          Text(controller.contactNames.length.toString()),
           SizedBox(
             height: 700,
             child: ListView.builder(
-                itemCount: controller.contacts.length,
+                itemCount: controller.contactNames.length,
                 itemBuilder: ((context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                         color: Colors.green,
-                        child: Text(controller.contacts.keys.elementAt(index))),
+                        child: Text(controller.contactNames[index])),
                   );
                 })),
           ),

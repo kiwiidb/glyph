@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,23 @@ class MainControlller extends GetxController {
   final TextEditingController pubkeyController = TextEditingController();
   var utxos = List<Utxo>.empty().obs;
   var contacts = <String, String>{}.obs;
+  var contactNames = List<String>.empty().obs;
   var loading = true.obs;
+  late WebSocket ws;
+  static const _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  static final Random _rnd = Random();
 
   @override
-  void onInit() {
-    fetchNostrFollows("dummy");
+  void onInit() async {
+    // Connecting to a nostr relay using websocket
+    ws = await WebSocket.connect(
+      'wss://relay.damus.io', // or any nostr relay
+    );
+    startListenLoop();
+    await Future.delayed(const Duration(seconds: 1));
+    fetchNostrFollows(
+        "8c3b267e9db6b0115498cc3efcd187d1474864940ae8ff977826b9d83d205877");
     super.onInit();
   }
 
@@ -56,63 +69,73 @@ class MainControlller extends GetxController {
 
   void fetchNostrFollows(String pubkey) async {
 // Create a subscription message request with one or many filters
-    Request requestWithFilter = Request("sdfsdfsdfs", [
-      Filter(
-        p: ["8c3b267e9db6b0115498cc3efcd187d1474864940ae8ff977826b9d83d205877"],
-        kinds: [3],
-        limit: 500,
-      )
+    Request requestWithFilter = Request(getRandomString(10), [
+      Filter(authors: [pubkey], kinds: [3])
     ]);
 
-    // Connecting to a nostr relay using websocket
-    WebSocket webSocket = await WebSocket.connect(
-      'wss://relay.damus.io', // or any nostr relay
-    );
-    // if the current socket fail try another one
-    // wss://nostr.sandwich.farm
-    // wss://relay.damus.io
-
     // Send a request message to the WebSocket server
-    webSocket.add(requestWithFilter.serialize());
+    ws.add(requestWithFilter.serialize());
 
     // Listen for events from the WebSocket server
-    print("started listening..");
-    await Future.delayed(Duration(seconds: 1));
-    webSocket.listen((event) {
-      var parsed = Message.deserialize(event).message as Event;
-      contacts.clear();
-      for (var tag in parsed.tags) {
-        contacts[tag[1]] = "";
+    print("fetching contacts..");
+  }
+
+  void startListenLoop() {
+    print("start listen loop");
+    ws.listen((event) {
+      print(event);
+      var parsedMsg = Message.deserialize(event).message;
+      if (parsedMsg is Event) {
+        for (var tag in parsedMsg.tags) {
+          if (parsedMsg.kind == 3 && tag.length == 2 && tag[0] == "p") {
+            contacts[tag[1]] = "";
+            fetchProfile(tag[1]);
+          }
+        }
+        if (parsedMsg.kind == 0) {
+          print("found profile");
+          contactNames.add(parsedMsg.content);
+        }
+      }
+    });
+  }
+
+  void fetchProfile(String pubkey) async {
+    print("fetching profile");
+    Request requestWithFilter = Request(getRandomString(10), [
+      Filter(authors: [pubkey], kinds: [0])
+    ]);
+
+    // Send a request message to the WebSocket server
+    ws.add(requestWithFilter.serialize());
+  }
+
+  List<int> _convertBits(List<int> data, int from, int to, bool pad) {
+    var acc = 0;
+    var bits = 0;
+    var result = <int>[];
+    var maxv = (1 << to) - 1;
+
+    data.forEach((v) {
+      if (v < 0 || (v >> from) != 0) {
+        throw Exception();
+      }
+      acc = (acc << from) | v;
+      bits += from;
+      while (bits >= to) {
+        bits -= to;
+        result.add((acc >> bits) & maxv);
       }
     });
 
-    // Close the WebSocket connection
-    await webSocket.close();
+    if (pad) {
+      if (bits > 0) {
+        result.add((acc << (to - bits)) & maxv);
+      }
+    }
+    return result;
   }
-}
 
-List<int> _convertBits(List<int> data, int from, int to, bool pad) {
-  var acc = 0;
-  var bits = 0;
-  var result = <int>[];
-  var maxv = (1 << to) - 1;
-
-  data.forEach((v) {
-    if (v < 0 || (v >> from) != 0) {
-      throw Exception();
-    }
-    acc = (acc << from) | v;
-    bits += from;
-    while (bits >= to) {
-      bits -= to;
-      result.add((acc >> bits) & maxv);
-    }
-  });
-
-  if (pad) {
-    if (bits > 0) {
-      result.add((acc << (to - bits)) & maxv);
-    }
-  }
-  return result;
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 }
