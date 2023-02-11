@@ -11,11 +11,12 @@ import 'package:glyph/models/utxo.dart';
 import 'package:http/http.dart' as http;
 import 'package:nostr/nostr.dart';
 
+import '../models/nostr_profile.dart';
+
 class MainControlller extends GetxController {
   final TextEditingController pubkeyController = TextEditingController();
   var utxos = List<Utxo>.empty().obs;
-  var contacts = <String, String>{}.obs;
-  var contactNames = List<String>.empty().obs;
+  var contacts = <String, Profile>{}.obs;
   var loading = true.obs;
   late WebSocket ws;
   static const _chars =
@@ -83,25 +84,23 @@ class MainControlller extends GetxController {
   void startListenLoop() {
     print("start listen loop");
     ws.listen((event) {
-      print(event);
       var parsedMsg = Message.deserialize(event).message;
       if (parsedMsg is Event) {
         for (var tag in parsedMsg.tags) {
           if (parsedMsg.kind == 3 && tag.length == 2 && tag[0] == "p") {
-            contacts[tag[1]] = "";
             fetchProfile(tag[1]);
           }
         }
         if (parsedMsg.kind == 0) {
-          print("found profile");
-          contactNames.add(parsedMsg.content);
+          var parsedProfile =
+              jsonDecode(parsedMsg.content) as Map<String, dynamic>;
+          contacts[parsedMsg.pubkey] = Profile.fromJson(parsedProfile);
         }
       }
     });
   }
 
   void fetchProfile(String pubkey) async {
-    print("fetching profile");
     Request requestWithFilter = Request(getRandomString(10), [
       Filter(authors: [pubkey], kinds: [0])
     ]);
