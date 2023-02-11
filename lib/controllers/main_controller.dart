@@ -8,13 +8,13 @@ import 'package:get/get.dart';
 import 'package:convert/convert.dart';
 import 'package:dart_bech32/dart_bech32.dart';
 import 'package:glyph/models/utxo.dart';
+import 'package:glyph/views/inscription_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:nostr/nostr.dart';
 
 import '../models/nostr_profile.dart';
 
 class MainControlller extends GetxController {
-  final TextEditingController pubkeyController = TextEditingController();
   var utxos = List<Utxo>.empty().obs;
   var contacts = <String, Profile>{}.obs;
   var loading = true.obs;
@@ -36,10 +36,16 @@ class MainControlller extends GetxController {
     super.onInit();
   }
 
+  void goToInscriptions(String pubkey) async {
+    await fetchInscriptions(pubkey);
+    Get.to(InscriptionView());
+  }
+
   String getAddressFromPubkey(String pubkey) {
     //damn I don't know what I'm doing
-    var decoded = bech32.decode(pubkey);
-    var newList = List<int>.from(decoded.words);
+    //var decoded = bech32.decode(pubkey);
+    var pubkeyWords = _convertBits(hex.decode(pubkey), 8, 5, true);
+    var newList = List<int>.from(pubkeyWords);
     //add segwit version (1: taproot)
     newList.insert(0, 1);
     var newWords = Uint8List.fromList(newList);
@@ -47,13 +53,14 @@ class MainControlller extends GetxController {
     return encoded;
   }
 
-  void fetchInscriptions() async {
-    var p2tr = getAddressFromPubkey(pubkeyController.text);
+  Future<void> fetchInscriptions(String pubkey) async {
+    var p2tr = getAddressFromPubkey(pubkey);
     utxos.value = await fetchUtxos(p2tr);
   }
 
   Future<List<Utxo>> fetchUtxos(String address) async {
     var url = Uri.parse('https://mempool.space/api/address/$address/utxo');
+    print(url.toString());
     var res = await http.get(
       url,
     );

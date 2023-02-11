@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:glyph/views/contacts.dart';
-import 'package:glyph/views/home.dart';
+import 'package:glyph/views/inscription_list.dart';
 
 void main() {
   runApp(const MyApp());
