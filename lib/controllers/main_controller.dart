@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:convert/convert.dart';
 import 'package:dart_bech32/dart_bech32.dart';
+import 'package:glyph/models/bitcoin_transaction.dart';
 import 'package:glyph/models/utxo.dart';
 import 'package:glyph/views/inscription_list.dart';
 import 'package:http/http.dart' as http;
@@ -38,7 +39,7 @@ class MainControlller extends GetxController {
 
   void goToInscriptions(String pubkey) async {
     await fetchInscriptions(pubkey);
-    Get.to(InscriptionView());
+    Get.to(() => InscriptionView());
   }
 
   String getAddressFromPubkey(String pubkey) {
@@ -60,7 +61,6 @@ class MainControlller extends GetxController {
 
   Future<List<Utxo>> fetchUtxos(String address) async {
     var url = Uri.parse('https://mempool.space/api/address/$address/utxo');
-    print(url.toString());
     var res = await http.get(
       url,
     );
@@ -68,7 +68,47 @@ class MainControlller extends GetxController {
       throw Exception('http.get error: statusCode= ${res.statusCode}');
     }
     var parsed = jsonDecode(res.body) as List;
-    return parsed.map((e) => Utxo.fromJson(e)).toList();
+    var utxoMap = parsed.map((e) => Utxo.fromJson(e));
+    //var newMap = await Future.wait(
+    //    utxoMap.map((utxo) async => await lookupInscription(utxo, 0)));
+    return utxoMap.toList();
+  }
+
+  Future<Utxo> lookupInscription(Utxo utxo, int attempt) async {
+    //check if the tx has an inscription
+    //if not, recursively look up it's inputs
+    //up to X (let's say 5) levels deep (this needs a real solution)
+    //and check if those have inscriptions
+    var maxAttempts = 5;
+    if (attempt == maxAttempts) {
+      return Utxo();
+    }
+    var uri =
+        Uri.parse("https://ordinals.com/inscription/${utxo.txid}i${utxo.vout}");
+    var res = await http.get(
+      uri,
+    );
+    if (res.statusCode == 200) {
+      //found inscription
+      return utxo;
+    }
+    //look up previous tx from mempool;
+    print("looking up prev tx from mempool");
+    var url = Uri.parse('https://mempool.space/api/tx/${utxo.txid}');
+    res = await http.get(
+      url,
+    );
+    if (res.statusCode != 200) {
+      throw Exception('http.get error: statusCode= ${res.statusCode}');
+    }
+    var parsed = BitcoinTransaction.fromJson(jsonDecode(res.body));
+    if (parsed.vin!.isEmpty) {
+      return Utxo();
+    }
+    //call this function again
+    return lookupInscription(
+        Utxo(txid: parsed.vin![0].txid, vout: parsed.vin![0].vout),
+        attempt + 1);
   }
 
   String getImageUrl(Utxo utxo) {
