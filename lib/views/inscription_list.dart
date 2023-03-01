@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:glyph/controllers/main_controller.dart';
+import 'package:glyph/controllers/inscription_controller.dart';
 
 class InscriptionView extends StatelessWidget {
   InscriptionView({super.key});
-  final MainControlller c = Get.put(MainControlller());
+  final InscriptionControlller c = Get.put(InscriptionControlller());
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class InscriptionView extends StatelessWidget {
         backgroundColor: Colors.black,
         title: const Text("Glyph"),
       ),
-      body: GetX<MainControlller>(builder: (controller) {
+      body: GetX<InscriptionControlller>(builder: (controller) {
         return Padding(
           padding: const EdgeInsets.all(10.0),
           child: GridView.builder(
