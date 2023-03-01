@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:glyph/controllers/nostr.dart';
 
 import '../components/cards/app_card.dart';
 import '../controllers/contact_controller.dart';
@@ -9,8 +10,7 @@ import 'contact_pay.dart';
 
 class ContactOverView extends StatelessWidget {
   final ContactController contactController = Get.put(ContactController());
-  final ContactPageController contactPageController =
-      Get.put(ContactPageController());
+  final NostrControlller nostrControlller = Get.put(NostrControlller());
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -63,7 +63,7 @@ class ContactWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Image.network(
-            contact.picture!,
+            contact.picture,
             width: 60,
           ),
           const SizedBox(width: 15.0),
@@ -99,7 +99,7 @@ class ContactWidget extends StatelessWidget {
   getSecondRow(Profile contact) {
     return Text(
       //todo
-      extractHost(contact.lightning!),
+      extractHost(contact.lud16!),
       style: const TextStyle(
         fontSize: 13.0,
         fontWeight: FontWeight.bold,

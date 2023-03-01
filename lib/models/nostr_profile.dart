@@ -1,18 +1,25 @@
 class Profile {
   String? name;
-  String? picture;
+  String picture;
   String? about;
   String? nip05;
-  String? lightning;
+  String? lud16;
 
-  Profile({this.name, this.picture, this.about, this.nip05, this.lightning});
+  Profile(
+      {this.name,
+      this.picture = "https://robohash.org/kwinten",
+      this.about,
+      this.nip05,
+      this.lud16});
 
-  Profile.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    picture = json['picture'];
-    about = json['about'];
-    nip05 = json['nip05'];
-    lightning = json['lightning'];
+  factory Profile.fromJson(Map<String, dynamic> json) {
+    return Profile(
+      name: json['name'],
+      about: json['about'],
+      picture: json['picture'] ?? 'https://robohash.org/kwinten',
+      nip05: json['nip05'],
+      lud16: json['lud16'],
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -21,7 +28,7 @@ class Profile {
     data['picture'] = picture;
     data['about'] = about;
     data['nip05'] = nip05;
-    data['lightning'] = lightning;
+    data['lud16'] = lud16;
     return data;
   }
 }

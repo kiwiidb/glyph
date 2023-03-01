@@ -42,7 +42,7 @@ class ContactPayView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Image.network(
-                          contact.picture!,
+                          contact.picture,
                           width: 100,
                         ),
                         const SizedBox(width: 16),
@@ -58,7 +58,7 @@ class ContactPayView extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                extractHost(contact.lightning!),
+                                extractHost(contact.lud16!),
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,

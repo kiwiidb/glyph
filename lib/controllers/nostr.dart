@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:convert/convert.dart';
 import 'package:dart_bech32/dart_bech32.dart';
+import 'package:glyph/controllers/contact_page_controller.dart';
 import 'package:glyph/models/bitcoin_transaction.dart';
 import 'package:glyph/models/utxo.dart';
 import 'package:glyph/views/inscription_list.dart';
@@ -18,6 +19,8 @@ import '../models/nostr_profile.dart';
 class NostrControlller extends GetxController {
   var loading = true.obs;
   late WebSocket ws;
+  ContactPageController contactPageController =
+      Get.put(ContactPageController());
   static const _chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   static final Random _rnd = Random();
@@ -30,7 +33,8 @@ class NostrControlller extends GetxController {
     );
     startListenLoop();
     await Future.delayed(const Duration(seconds: 1));
-    //todo: sync follows
+    fetchNostrFollows(
+        "8c3b267e9db6b0115498cc3efcd187d1474864940ae8ff977826b9d83d205877");
     super.onInit();
   }
 
@@ -60,7 +64,10 @@ class NostrControlller extends GetxController {
         if (parsedMsg.kind == 0) {
           var parsedProfile =
               jsonDecode(parsedMsg.content) as Map<String, dynamic>;
-          //todo: add to contacts
+          Profile prf = Profile.fromJson(parsedProfile);
+          if (prf.lud16 != null) {
+            contactPageController.storeContact(prf);
+          }
         }
       }
     });

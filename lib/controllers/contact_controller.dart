@@ -54,11 +54,11 @@ class ContactController extends GetxController {
     //var btcPrice = appBarController.priceInfo.value.bitcoinPriceInEuro;
     //var satAmt = ((amt / btcPrice) * 1e8).round();
     //Todo
-    var satAmt = 1;
+    var satAmt = amt;
     //var pay = await apiService.fetchInvoice(satAmt,
     //    selectedContact.value.flitzDepositId, descriptionController.text);
     var first =
-        await lnUrlPayService.lnAddressCall(selectedContact.value.lightning!);
+        await lnUrlPayService.lnAddressCall(selectedContact.value.lud16!);
     var pay = await lnUrlPayService.fetchInvoice(first.callback!, satAmt);
     //todo check amount and hash
     launchLnUrl("lightning:${pay.pr!}");
