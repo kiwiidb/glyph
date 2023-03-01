@@ -12,7 +12,20 @@ class ContactPageController extends GetxController {
 
   @override
   void onInit() async {
-    await fetchContacts();
+    //todo: real stuff
+    //await fetchContacts();
+    contacts.add(Profile(
+        name: "kwinten",
+        lightning: "kiwiidb@getalby.com",
+        about: "lightning stuff @getalby",
+        picture: "https://kwintendebacker.com/images/foto.jpg"));
+    contacts.add(Profile(
+        name: "bumi",
+        lightning: "bumi@getalby.com",
+        about:
+            "working on getalby.com - a browser extension with lightning and Nostr support",
+        picture:
+            "https://imgproxy.iris.to/insecure/plain/https://michaelbumann.com/img/profile_small.jpg"));
     super.onInit();
   }
 

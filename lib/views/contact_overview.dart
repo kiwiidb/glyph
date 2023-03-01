@@ -62,7 +62,10 @@ class ContactWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Image.network(contact.picture!),
+          Image.network(
+            contact.picture!,
+            width: 60,
+          ),
           const SizedBox(width: 15.0),
           Expanded(
             child: Padding(
@@ -96,7 +99,7 @@ class ContactWidget extends StatelessWidget {
   getSecondRow(Profile contact) {
     return Text(
       //todo
-      extractHost(contact.nip05!),
+      extractHost(contact.lightning!),
       style: const TextStyle(
         fontSize: 13.0,
         fontWeight: FontWeight.bold,
