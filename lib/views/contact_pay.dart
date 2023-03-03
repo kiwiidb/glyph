@@ -41,9 +41,12 @@ class ContactPayView extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Image.network(
-                          contact.picture,
-                          width: 100,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            contact.picture,
+                            width: 100,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(

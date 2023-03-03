@@ -15,7 +15,7 @@ class ContactOverView extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
       child: GetX<ContactPageController>(builder: (controller) {
         if (controller.contacts.isEmpty) {
           return Padding(
@@ -27,9 +27,14 @@ class ContactOverView extends StatelessWidget {
             shrinkWrap: true,
             primary: false,
             padding: EdgeInsets.zero,
-            itemCount: controller.contacts.length,
+            itemCount: controller.contacts.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, i) {
+              if (i == controller.contacts.length) {
+                return const SizedBox(
+                  height: 70,
+                );
+              }
               var contact = controller.contacts[i];
               return InkWell(
                 onTap: () {
@@ -62,9 +67,12 @@ class ContactWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Image.network(
-            contact.picture,
-            width: 60,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              contact.picture,
+              width: 60,
+            ),
           ),
           const SizedBox(width: 15.0),
           Expanded(

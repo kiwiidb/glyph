@@ -28,11 +28,16 @@ class IndexPage extends StatelessWidget {
             controller: s.pageController,
             itemCount: 4,
             itemBuilder: (BuildContext context, int index) {
-              return [ContactOverView(), ContactOverView()][index];
+              return [
+                ContactOverView(),
+                ContactOverView(),
+                ContactOverView(),
+                ContactOverView()
+              ][index];
             },
           ),
           resizeToAvoidBottomInset: false,
-          bottomNavigationBar: MyBottomNavigationBar(),
+          //bottomNavigationBar: MyBottomNavigationBar(),
         ),
       ),
     );

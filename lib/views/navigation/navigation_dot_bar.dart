@@ -5,7 +5,6 @@ import '../../constants/colors.dart';
 class BottomNavigationDotBar extends StatefulWidget {
   final List<BottomNavigationDotBarItem> leftItems;
   final List<BottomNavigationDotBarItem> rightItems;
-  final Color activeColor;
   final Color color;
   final int currentIndex;
 
@@ -13,7 +12,6 @@ class BottomNavigationDotBar extends StatefulWidget {
     required this.leftItems,
     required this.rightItems,
     required this.currentIndex,
-    required this.activeColor,
     this.color = Colors.black45,
   });
 
@@ -22,7 +20,7 @@ class BottomNavigationDotBar extends StatefulWidget {
 }
 
 class _BottomNavigationDotBarState extends State<BottomNavigationDotBar> {
-  late Color _color, _activeColor;
+  late Color _color;
 
   @override
   void initState() {
@@ -32,7 +30,6 @@ class _BottomNavigationDotBarState extends State<BottomNavigationDotBar> {
 
   _afterLayout(_) {
     _color = widget.color ?? Colors.black45;
-    _activeColor = widget.activeColor ?? Theme.of(context).primaryColor;
   }
 
   @override
@@ -74,7 +71,7 @@ class _BottomNavigationDotBarState extends State<BottomNavigationDotBar> {
     List<_NavigationIconButton> children = <_NavigationIconButton>[];
     mapItem.forEach((index, item) => children.add(_NavigationIconButton(
           item.icon,
-          (index == widget.currentIndex) ? _activeColor : _color,
+          _color,
           item.onTap,
           item.id == widget.currentIndex,
         )));

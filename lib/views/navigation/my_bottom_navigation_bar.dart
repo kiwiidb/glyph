@@ -14,7 +14,6 @@ class MyBottomNavigationBar extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.fromLTRB(32.0, 0, 32.0, 32.0),
           child: BottomNavigationDotBar(
-            activeColor: kWhiteColor,
             color: kWhiteColor,
             currentIndex: s.currentPage.value,
             leftItems: [
