@@ -1,4 +1,5 @@
 class Profile {
+  String? pubkey;
   String? name;
   String picture;
   String? about;
@@ -8,6 +9,7 @@ class Profile {
   Profile(
       {this.name,
       this.picture = "https://robohash.org/kwinten",
+      this.pubkey,
       this.about,
       this.nip05,
       this.lud16});

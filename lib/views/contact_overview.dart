@@ -35,7 +35,8 @@ class ContactOverView extends StatelessWidget {
                   height: 70,
                 );
               }
-              var contact = controller.contacts[i];
+              String key = controller.contacts.keys.elementAt(i);
+              Profile contact = controller.contacts[key]!;
               return InkWell(
                 onTap: () {
                   contactController.selectedContact.value = contact;
@@ -82,7 +83,7 @@ class ContactWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    contact.name!.toUpperCase(),
+                    contact.name ?? contact.name!,
                     style: const TextStyle(
                       fontSize: 13.0,
                       fontWeight: FontWeight.bold,
@@ -107,7 +108,7 @@ class ContactWidget extends StatelessWidget {
   getSecondRow(Profile contact) {
     return Text(
       //todo
-      extractHost(contact.lud16!),
+      extractHost(contact.lud16 ?? contact.lud16!),
       style: const TextStyle(
         fontSize: 13.0,
         fontWeight: FontWeight.bold,

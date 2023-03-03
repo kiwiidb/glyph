@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -8,31 +9,30 @@ import '../models/nostr_profile.dart';
 
 class ContactPageController extends GetxController {
   var currentTabNumber = 0.obs;
-  var contacts = <Profile>[].obs;
+  var contacts = <String, Profile>{}.obs;
   GetStorage contactBox = GetStorage();
 
   @override
   void onInit() async {
+    fetchContacts();
     super.onInit();
   }
 
   Future<void> fetchContacts() async {
     var keys = contactBox.getKeys();
-    contacts.removeWhere((element) => true);
     for (String key in keys) {
-      var cJson = contactBox.read(key);
-      if (cJson is Profile) {
-        contacts.add(cJson);
-      }
+      Map<String, dynamic> cJson = contactBox.read(key);
+      print(cJson);
+      contacts[key] = Profile.fromJson(cJson);
     }
   }
 
   Future<void> storeContact(Profile c) async {
-    await contactBox.write(c.name!, c);
-    contacts.add(c);
+    await contactBox.write(c.pubkey!, c);
+    contacts[c.pubkey!] = c;
   }
 
   deleteContact(Profile value) async {
-    await contactBox.remove(value.name!);
+    await contactBox.remove(value.pubkey!);
   }
 }

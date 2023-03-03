@@ -48,7 +48,7 @@ class NostrControlller extends GetxController {
     ws.add(requestWithFilter.serialize());
 
     // Listen for events from the WebSocket server
-    print("fetching contacts..");
+    print("updating contacts from nostr..");
   }
 
   void startListenLoop() {
@@ -65,7 +65,8 @@ class NostrControlller extends GetxController {
           var parsedProfile =
               jsonDecode(parsedMsg.content) as Map<String, dynamic>;
           Profile prf = Profile.fromJson(parsedProfile);
-          if (prf.lud16 != null) {
+          prf.pubkey = parsedMsg.pubkey;
+          if (prf.lud16 != null && prf.pubkey != null && prf.name != null) {
             contactPageController.storeContact(prf);
           }
         }
