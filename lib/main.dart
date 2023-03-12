@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:glyph/app_theme.dart';
+import 'package:glyph/views/auth/login.dart';
 import 'package:glyph/views/index_page.dart';
+
+import 'views/index_or_login.dart';
 
 void main() async {
   await GetStorage.init();
@@ -18,7 +21,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: AppTheme().theme,
-      home: const IndexPage(),
+      home: IndexOrLogin(),
     );
   }
 }

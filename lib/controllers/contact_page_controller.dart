@@ -22,7 +22,6 @@ class ContactPageController extends GetxController {
     var keys = contactBox.getKeys();
     for (String key in keys) {
       Map<String, dynamic> cJson = contactBox.read(key);
-      print(cJson);
       contacts[key] = Profile.fromJson(cJson);
     }
   }

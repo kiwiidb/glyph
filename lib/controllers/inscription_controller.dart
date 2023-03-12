@@ -31,7 +31,7 @@ class InscriptionControlller extends GetxController {
   String getAddressFromPubkey(String pubkey) {
     //damn I don't know what I'm doing
     //var decoded = bech32.decode(pubkey);
-    var pubkeyWords = _convertBits(hex.decode(pubkey), 8, 5, true);
+    var pubkeyWords = convertBits(hex.decode(pubkey), 8, 5, true);
     var newList = List<int>.from(pubkeyWords);
     //add segwit version (1: taproot)
     newList.insert(0, 1);
@@ -102,32 +102,32 @@ class InscriptionControlller extends GetxController {
     return 'https://ordinals.com/content/${utxo.txid}i${utxo.vout}';
   }
 
-  List<int> _convertBits(List<int> data, int from, int to, bool pad) {
-    var acc = 0;
-    var bits = 0;
-    var result = <int>[];
-    var maxv = (1 << to) - 1;
-
-    data.forEach((v) {
-      if (v < 0 || (v >> from) != 0) {
-        throw Exception();
-      }
-      acc = (acc << from) | v;
-      bits += from;
-      while (bits >= to) {
-        bits -= to;
-        result.add((acc >> bits) & maxv);
-      }
-    });
-
-    if (pad) {
-      if (bits > 0) {
-        result.add((acc << (to - bits)) & maxv);
-      }
-    }
-    return result;
-  }
-
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+}
+
+List<int> convertBits(List<int> data, int from, int to, bool pad) {
+  var acc = 0;
+  var bits = 0;
+  var result = <int>[];
+  var maxv = (1 << to) - 1;
+
+  data.forEach((v) {
+    if (v < 0 || (v >> from) != 0) {
+      throw Exception();
+    }
+    acc = (acc << from) | v;
+    bits += from;
+    while (bits >= to) {
+      bits -= to;
+      result.add((acc >> bits) & maxv);
+    }
+  });
+
+  if (pad) {
+    if (bits > 0) {
+      result.add((acc << (to - bits)) & maxv);
+    }
+  }
+  return result;
 }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:convert/convert.dart';
 import 'package:dart_bech32/dart_bech32.dart';
+import 'package:glyph/controllers/auth_controller.dart';
 import 'package:glyph/controllers/contact_page_controller.dart';
 import 'package:glyph/models/bitcoin_transaction.dart';
 import 'package:glyph/models/utxo.dart';
@@ -17,6 +18,7 @@ import 'package:nostr/nostr.dart';
 import '../models/nostr_profile.dart';
 
 class NostrControlller extends GetxController {
+  final AuthController authController = Get.put(AuthController());
   var loading = true.obs;
   late WebSocket ws;
   ContactPageController contactPageController =
@@ -33,8 +35,7 @@ class NostrControlller extends GetxController {
     );
     startListenLoop();
     await Future.delayed(const Duration(seconds: 1));
-    fetchNostrFollows(
-        "8c3b267e9db6b0115498cc3efcd187d1474864940ae8ff977826b9d83d205877");
+    fetchNostrFollows(authController.pubkey.value);
     super.onInit();
   }
 
