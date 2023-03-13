@@ -55,6 +55,7 @@ class NostrControlller extends GetxController {
   void startListenLoop() {
     print("start listen loop");
     ws.listen((event) {
+      Get.snackbar("event", event);
       var parsedMsg = Message.deserialize(event).message;
       if (parsedMsg is Event) {
         for (var tag in parsedMsg.tags) {
