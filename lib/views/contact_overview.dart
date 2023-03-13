@@ -20,7 +20,7 @@ class ContactOverView extends StatelessWidget {
         if (controller.contacts.isEmpty) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 80.0, horizontal: 10),
-            child: Text("no-contacts".tr),
+            child: Text("Fetching contacts...".tr),
           );
         }
         return ListView.separated(

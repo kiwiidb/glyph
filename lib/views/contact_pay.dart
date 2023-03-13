@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../components/buttons/gradient_button.dart';
 import '../components/labeled_text_form_field.dart';
-import '../constants/app_constatns.dart';
+import '../constants/app_constants.dart';
 import '../constants/colors.dart';
 import '../controllers/contact_controller.dart';
 import '../controllers/contact_page_controller.dart';

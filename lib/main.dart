@@ -8,7 +8,8 @@ import 'package:glyph/views/index_page.dart';
 import 'views/index_or_login.dart';
 
 void main() async {
-  await GetStorage.init();
+  await GetStorage.init('contacts');
+  await GetStorage.init('identity');
   runApp(const MyApp());
 }
 

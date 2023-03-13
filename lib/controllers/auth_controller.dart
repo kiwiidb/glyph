@@ -12,11 +12,11 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   final TextEditingController pubkeyController = TextEditingController();
   var pubkey = "".obs;
   var isLoading = false.obs;
-  GetStorage contactBox = GetStorage("identity");
+  GetStorage accountStorage = GetStorage("identity");
 
   @override
   void onInit() async {
-    var pk = await contactBox.read("identity-pubkey");
+    var pk = await accountStorage.read("identity-pubkey");
     if (pk != "" && pk != null) {
       pubkey.value = pk;
     }
@@ -28,11 +28,12 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       var decoded = bech32.decode(pubkey);
       var pubkeyBytes = bech32.fromWords(decoded.words);
       var pubkeyHex = hex.encode(pubkeyBytes);
-      await contactBox.write("identity-pubkey", pubkeyHex);
+      await accountStorage.write("identity-pubkey", pubkeyHex);
+      this.pubkey.value = pubkeyHex;
     } catch (e) {
       Get.snackbar("Invalid public key", e.toString(),
           snackPosition: SnackPosition.TOP);
+      return;
     }
-    this.pubkey.value = pubkey;
   }
 }

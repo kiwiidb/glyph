@@ -10,7 +10,7 @@ import '../models/nostr_profile.dart';
 class ContactPageController extends GetxController {
   var currentTabNumber = 0.obs;
   var contacts = <String, Profile>{}.obs;
-  GetStorage contactBox = GetStorage();
+  GetStorage contactBox = GetStorage('contacts');
 
   @override
   void onInit() async {
