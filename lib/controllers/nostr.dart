@@ -32,7 +32,7 @@ class NostrControlller extends GetxController {
     // Connecting to a nostr relay using websocket
     try {
       ws = await WebSocket.connect(
-        'wss://eden.nostr.land', // or any nostr relay
+        'wss://relay.damus.io', // or any nostr relay
       );
       startListenLoop();
       await Future.delayed(const Duration(seconds: 1));
@@ -77,6 +77,8 @@ class NostrControlller extends GetxController {
           }
         }
       }
+    }, onError: () {
+      Get.snackbar("error", "");
     });
   }
 
