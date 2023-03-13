@@ -77,8 +77,6 @@ class NostrControlller extends GetxController {
           }
         }
       }
-    }, onError: () {
-      Get.snackbar("error", "");
     });
   }
 
