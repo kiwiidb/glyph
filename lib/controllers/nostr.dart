@@ -38,7 +38,7 @@ class NostrControlller extends GetxController {
       await Future.delayed(const Duration(seconds: 1));
       fetchNostrFollows(authController.pubkey.value);
     } catch (e) {
-      Get.snackbar("something went wrong", e.toString());
+      Get.snackbar("Something went wrong", e.toString());
     }
 
     super.onInit();
@@ -54,14 +54,11 @@ class NostrControlller extends GetxController {
     ws.add(requestWithFilter.serialize());
 
     // Listen for events from the WebSocket server
-    print("updating contacts from nostr..");
     Get.snackbar("updating contacts...", "");
   }
 
   void startListenLoop() {
-    print("start listen loop");
     ws.listen((event) {
-      Get.snackbar("event", event);
       var parsedMsg = Message.deserialize(event).message;
       if (parsedMsg is Event) {
         for (var tag in parsedMsg.tags) {
