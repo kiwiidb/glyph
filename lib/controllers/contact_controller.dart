@@ -33,28 +33,23 @@ class ContactController extends GetxController {
   }
 
   void fetchInvoice() async {
-    var amt;
+    double amt;
     try {
       amt = double.parse(amountController.text);
     } catch (e) {
       Get.snackbar("amount-too-small".tr, "Please fill in an amount.",
           snackPosition: SnackPosition.BOTTOM);
+      return;
     }
     if (amt <= 0) {
       Get.snackbar("amount-too-small".tr, "Please fill in an amount.",
           snackPosition: SnackPosition.BOTTOM);
       return;
     }
-    if (amt > 50) {
-      Get.snackbar(
-          "Amount too big".tr, "Amount should be smaller than 50 euro.",
-          snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
     //var btcPrice = appBarController.priceInfo.value.bitcoinPriceInEuro;
     //var satAmt = ((amt / btcPrice) * 1e8).round();
     //Todo
-    var satAmt = amt;
+    var satAmt = amt.round();
     //var pay = await apiService.fetchInvoice(satAmt,
     //    selectedContact.value.flitzDepositId, descriptionController.text);
     var first =
@@ -70,8 +65,8 @@ class ContactController extends GetxController {
     } else {
       Get.snackbar(
           "Could not open LN link. Please install one of the supported LN wallets on your device.",
-          "See the 'explore' section for a list of supported wallets.",
-          snackPosition: SnackPosition.BOTTOM);
+          "",
+          snackPosition: SnackPosition.TOP);
     }
   }
 

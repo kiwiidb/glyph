@@ -83,7 +83,7 @@ class ContactPayView extends StatelessWidget {
                         child: Align(
                           alignment: Alignment.centerRight,
                           widthFactor: 0.0,
-                          child: Text('€ '),
+                          child: Text('sats '),
                         ),
                       ),
                       keyboardType: TextInputType.number,
