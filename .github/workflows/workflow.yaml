@@ -25,16 +25,16 @@ jobs:
               flutter-version: '3.3.9'
           # setup environment
           - uses: dart-lang/setup-dart@v1
-          - run: dart tool/tool_env.dart
+          # - run: dart tool/tool_env.dart
           # download firebase config, put it in right place
           # - run: wget $FIREBASE_ANDROID_CONFIG_URL -O android/app/google-services.json
           - run: flutter pub get
           - run: flutter build apk --release --split-per-abi
             # env:
-              # KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-              # KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-              # ALIAS: ${{ secrets.ALIAS }}
-              # KEY_PATH: key.jks
+            #   KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+            #   KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+            #   ALIAS: ${{ secrets.ALIAS }}
+            #   KEY_PATH: key.jks
           - name: Create a Release APK
             uses: ncipollo/release-action@v1
             with:
