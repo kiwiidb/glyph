@@ -31,7 +31,7 @@ class NostrControlller extends GetxController {
   void onInit() async {
     // Connecting to a nostr relay using websocket
     ws = await WebSocket.connect(
-      'wss://relay.damus.io', // or any nostr relay
+      'wss://eden.nostr.land', // or any nostr relay
     );
     startListenLoop();
     await Future.delayed(const Duration(seconds: 1));
