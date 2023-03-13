@@ -30,12 +30,17 @@ class NostrControlller extends GetxController {
   @override
   void onInit() async {
     // Connecting to a nostr relay using websocket
-    ws = await WebSocket.connect(
-      'wss://eden.nostr.land', // or any nostr relay
-    );
-    startListenLoop();
-    await Future.delayed(const Duration(seconds: 1));
-    fetchNostrFollows(authController.pubkey.value);
+    try {
+      ws = await WebSocket.connect(
+        'wss://eden.nostr.land', // or any nostr relay
+      );
+      startListenLoop();
+      await Future.delayed(const Duration(seconds: 1));
+      fetchNostrFollows(authController.pubkey.value);
+    } catch (e) {
+      Get.snackbar("something went wrong", e.toString());
+    }
+
     super.onInit();
   }
 
@@ -50,6 +55,7 @@ class NostrControlller extends GetxController {
 
     // Listen for events from the WebSocket server
     print("updating contacts from nostr..");
+    Get.snackbar("updating contacts...", "");
   }
 
   void startListenLoop() {
