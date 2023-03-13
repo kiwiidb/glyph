@@ -30,7 +30,7 @@ jobs:
           # - run: wget $FIREBASE_ANDROID_CONFIG_URL -O android/app/google-services.json
           - run: flutter pub get
           - run: flutter build apk --release --split-per-abi
-            env:
+            # env:
               # KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
               # KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
               # ALIAS: ${{ secrets.ALIAS }}
