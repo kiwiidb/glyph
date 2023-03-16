@@ -20,31 +20,38 @@ import '../models/nostr_profile.dart';
 class NostrControlller extends GetxController {
   final AuthController authController = Get.put(AuthController());
   var loading = true.obs;
-  late WebSocket ws;
   ContactPageController contactPageController =
       Get.put(ContactPageController());
   static const _chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   static final Random _rnd = Random();
+  static const defaultRelays = [
+    "wss://relay.damus.io",
+    "wss://eden.nostr.land",
+    "wss://nostr.fmt.wiz.biz",
+    "wss://nostr.zebedee.cloud",
+    "wss://brb.io"
+  ];
 
   @override
   void onInit() async {
-    // Connecting to a nostr relay using websocket
-    try {
-      ws = await WebSocket.connect(
-        'wss://relay.damus.io', // or any nostr relay
-      );
-      startListenLoop();
-      await Future.delayed(const Duration(seconds: 1));
-      fetchNostrFollows(authController.pubkey.value);
-    } catch (e) {
-      Get.snackbar("Something went wrong", e.toString());
+    // Chnnecting to a nostr relay using websocket
+    for (String relay in defaultRelays) {
+      try {
+        WebSocket ws = await WebSocket.connect(relay);
+        startListenLoop(ws);
+        await Future.delayed(const Duration(seconds: 1));
+        fetchNostrFollows(ws, authController.pubkey.value);
+      } catch (e) {
+        Get.snackbar(
+            "Something went wrong", "error ${e.toString()}, relay $relay");
+      }
     }
 
     super.onInit();
   }
 
-  void fetchNostrFollows(String pubkey) async {
+  void fetchNostrFollows(WebSocket ws, String pubkey) async {
 // Create a subscription message request with one or many filters
     Request requestWithFilter = Request(getRandomString(10), [
       Filter(authors: [pubkey], kinds: [3])
@@ -54,17 +61,15 @@ class NostrControlller extends GetxController {
     ws.add(requestWithFilter.serialize());
 
     // Listen for events from the WebSocket server
-    Get.snackbar("updating contacts...", "");
   }
 
-  void startListenLoop() {
+  void startListenLoop(WebSocket ws) {
     ws.listen((event) {
-      Get.snackbar("event", event.toString());
       var parsedMsg = Message.deserialize(event).message;
       if (parsedMsg is Event) {
         for (var tag in parsedMsg.tags) {
           if (parsedMsg.kind == 3 && tag.length == 2 && tag[0] == "p") {
-            fetchProfile(tag[1]);
+            fetchProfile(ws, tag[1]);
           }
         }
         if (parsedMsg.kind == 0) {
@@ -80,7 +85,7 @@ class NostrControlller extends GetxController {
     });
   }
 
-  void fetchProfile(String pubkey) async {
+  void fetchProfile(WebSocket ws, String pubkey) async {
     Request requestWithFilter = Request(getRandomString(10), [
       Filter(authors: [pubkey], kinds: [0])
     ]);

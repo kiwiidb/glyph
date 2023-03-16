@@ -71,8 +71,12 @@ class ContactWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
-              contact.picture,
+              "https://imgproxy.iris.to/insecure/plain/${contact.picture}",
               width: 60,
+              errorBuilder: (context, error, stackTrace) => Image.network(
+                "https://robohash.org/kwinten",
+                width: 60,
+              ),
             ),
           ),
           const SizedBox(width: 15.0),
