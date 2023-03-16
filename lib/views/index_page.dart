@@ -13,12 +13,18 @@ class IndexPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: const BoxDecoration(gradient: kBgGradient),
-      child: GetBuilder<WrapperController>(
+      child: GetX<WrapperController>(
         init: WrapperController(),
         builder: (s) => Scaffold(
           extendBody: true,
           appBar: AppBar(
-            title: Text(s.pageIndexTitle),
+            title: TextButton(
+              child: Text(
+                s.currentDisplayString.value,
+                style: const TextStyle(fontSize: 20),
+              ),
+              onPressed: () => {s.switchDisplay()},
+            ),
             actions: [],
           ),
           body: PageView.builder(

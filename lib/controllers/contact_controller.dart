@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/nostr_profile.dart';
+import '../models/rate.dart';
 import '../services/lnurl_pay_service.dart';
 
 class ContactController extends GetxController {
@@ -11,12 +12,11 @@ class ContactController extends GetxController {
       TextEditingController();
   final TextEditingController amountController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  //final ExchangeRateController appBarController =
-  //    Get.put(ExchangeRateController());
   final LnUrlPayService lnUrlPayService = Get.put(LnUrlPayService());
   var foundUsers = <Profile>[].obs;
   var searching = false.obs;
   var selectedContact = Profile().obs;
+  Rate rate = Rate();
 
   void setDescriptionText() {
     descriptionController.text = "Payment to ${selectedContact.value.name!}";
@@ -29,6 +29,7 @@ class ContactController extends GetxController {
         foundUsers.removeWhere((element) => true);
       }
     });
+    rate = await lnUrlPayService.getRate();
     super.onInit();
   }
 
@@ -46,12 +47,7 @@ class ContactController extends GetxController {
           snackPosition: SnackPosition.BOTTOM);
       return;
     }
-    //var btcPrice = appBarController.priceInfo.value.bitcoinPriceInEuro;
-    //var satAmt = ((amt / btcPrice) * 1e8).round();
-    //Todo
-    var satAmt = amt.round();
-    //var pay = await apiService.fetchInvoice(satAmt,
-    //    selectedContact.value.flitzDepositId, descriptionController.text);
+    var satAmt = ((amt / rate.rateFloat!) * 1e8).round();
     var first =
         await lnUrlPayService.lnAddressCall(selectedContact.value.lud16!);
     var pay = await lnUrlPayService.fetchInvoice(first.callback!, satAmt);

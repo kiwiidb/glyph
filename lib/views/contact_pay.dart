@@ -38,6 +38,9 @@ class ContactPayView extends StatelessWidget {
                         fontSize: 15.0,
                       ),
                     ),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -83,7 +86,7 @@ class ContactPayView extends StatelessWidget {
                         child: Align(
                           alignment: Alignment.centerRight,
                           widthFactor: 0.0,
-                          child: Text('sats '),
+                          child: Text('EUR '),
                         ),
                       ),
                       keyboardType: TextInputType.number,

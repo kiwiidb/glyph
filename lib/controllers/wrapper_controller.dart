@@ -1,9 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../services/lnurl_pay_service.dart';
+
 class WrapperController extends GetxController {
   final PageController pageController = PageController(initialPage: 0);
+  final LnUrlPayService lnUrlPayService = Get.put(LnUrlPayService());
   var currentPage = 0.obs;
+  var priceString = "".obs;
+  var moscowTimeString = "".obs;
+  var currentDisplayString = "".obs;
+
+  @override
+  void onInit() async {
+    var rate = await lnUrlPayService.getRate();
+    priceString.value = "${rate.code} ${rate.rateFloat!.floor()}";
+    moscowTimeString.value = "🕑 ${(1e8 / rate.rateFloat!).floor()}";
+    currentDisplayString.value = priceString.value;
+    super.onInit();
+  }
+
+  switchDisplay() {
+    if (currentDisplayString.value == priceString.value) {
+      currentDisplayString.value = moscowTimeString.value;
+    } else {
+      currentDisplayString.value = priceString.value;
+    }
+  }
 
   onItemTapped(int index) {
     pageController.jumpToPage(index);

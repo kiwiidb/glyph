@@ -5,6 +5,8 @@ import 'package:glyph/models/lnurlPrimary.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/rate.dart';
+
 class LnUrlPayService {
   static var client = http.Client();
 
@@ -62,5 +64,15 @@ class LnUrlPayService {
           snackPosition: SnackPosition.BOTTOM);
       throw ("There was an error fetching the lnurl data");
     }
+  }
+
+  //todo multi currency
+  Future<Rate> getRate() async {
+    var url = Uri.parse('https://getalby.com/api/rates/eur');
+    var res = await http.get(url);
+    if (res.statusCode != 200) {
+      throw Exception('http.get error: statusCode= ${res.statusCode}');
+    }
+    return Rate.fromJson(jsonDecode(res.body));
   }
 }
