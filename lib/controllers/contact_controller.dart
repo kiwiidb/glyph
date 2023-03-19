@@ -8,12 +8,9 @@ import '../models/rate.dart';
 import '../services/lnurl_pay_service.dart';
 
 class ContactController extends GetxController {
-  final TextEditingController searchLNAddressController =
-      TextEditingController();
   final TextEditingController amountController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final LnUrlPayService lnUrlPayService = Get.put(LnUrlPayService());
-  var foundUsers = <Profile>[].obs;
   var searching = false.obs;
   var selectedContact = Profile().obs;
   Rate rate = Rate();
@@ -24,11 +21,6 @@ class ContactController extends GetxController {
 
   @override
   void onInit() async {
-    searchLNAddressController.addListener(() async {
-      if (searchLNAddressController.text.isEmpty) {
-        foundUsers.removeWhere((element) => true);
-      }
-    });
     rate = await lnUrlPayService.getRate();
     super.onInit();
   }
@@ -64,16 +56,6 @@ class ContactController extends GetxController {
           "",
           snackPosition: SnackPosition.TOP);
     }
-  }
-
-  searchLNAddress() async {
-    if (!(searchLNAddressController.text.contains("@")) ||
-        !(searchLNAddressController.text.contains("."))) {
-      Get.snackbar("Wrong format", "Please enter a valid LN Address",
-          snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
-    //todo: stuff
   }
 
   getName(String text) {

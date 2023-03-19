@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ffi';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:glyph/controllers/nostr.dart';
@@ -10,11 +11,25 @@ import '../models/nostr_profile.dart';
 class ContactPageController extends GetxController {
   var currentTabNumber = 0.obs;
   var contacts = <String, Profile>{}.obs;
+  var shownContacts = <String, Profile>{}.obs;
   GetStorage contactBox = GetStorage('contacts');
+  final TextEditingController searchLNAddressController =
+      TextEditingController();
 
   @override
   void onInit() async {
-    fetchContacts();
+    searchLNAddressController.addListener(
+      () {
+        if (searchLNAddressController.text == "") {
+          shownContacts.addAll(contacts);
+        }
+        shownContacts.removeWhere((key, value) => !value.name!
+            .toLowerCase()
+            .startsWith(searchLNAddressController.text));
+      },
+    );
+    await fetchContacts();
+    shownContacts.addAll(contacts);
     super.onInit();
   }
 

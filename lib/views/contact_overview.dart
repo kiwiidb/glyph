@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:glyph/controllers/nostr.dart';
 
 import '../components/cards/app_card.dart';
+import '../components/labeled_text_form_field.dart';
 import '../controllers/contact_controller.dart';
 import '../controllers/contact_page_controller.dart';
 import '../models/nostr_profile.dart';
@@ -23,29 +24,39 @@ class ContactOverView extends StatelessWidget {
             child: Text("Fetching contacts...".tr),
           );
         }
-        return ListView.separated(
-            shrinkWrap: true,
-            primary: false,
-            padding: EdgeInsets.zero,
-            itemCount: controller.contacts.length + 1,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, i) {
-              if (i == controller.contacts.length) {
-                return const SizedBox(
-                  height: 70,
-                );
-              }
-              String key = controller.contacts.keys.elementAt(i);
-              Profile contact = controller.contacts[key]!;
-              return InkWell(
-                onTap: () {
-                  contactController.selectedContact.value = contact;
-                  contactController.setDescriptionText();
-                  Get.to(() => ContactPayView());
-                },
-                child: ContactWidget(contact: contact, width: width),
-              );
-            });
+        return Column(
+          children: [
+            SizedBox(
+              height: 100,
+              child: LabeledTextFormField(
+                label: "Search contacts",
+                controller: controller.searchLNAddressController,
+                keyboardType: TextInputType.emailAddress,
+              ),
+            ),
+            SizedBox(
+              height: 700,
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  primary: false,
+                  padding: EdgeInsets.zero,
+                  itemCount: controller.shownContacts.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, i) {
+                    String key = controller.shownContacts.keys.elementAt(i);
+                    Profile contact = controller.contacts[key]!;
+                    return InkWell(
+                      onTap: () {
+                        contactController.selectedContact.value = contact;
+                        contactController.setDescriptionText();
+                        Get.to(() => ContactPayView());
+                      },
+                      child: ContactWidget(contact: contact, width: width),
+                    );
+                  }),
+            ),
+          ],
+        );
       }),
     );
   }
