@@ -47,6 +47,9 @@ class ContactOverView extends StatelessWidget {
                     Profile contact = controller.contacts[key]!;
                     return InkWell(
                       onTap: () {
+                        if (contact.lud16 == null) {
+                          return;
+                        }
                         contactController.selectedContact.value = contact;
                         contactController.setDescriptionText();
                         Get.to(() => ContactPayView());
@@ -74,6 +77,10 @@ class ContactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget maybeArrow = Container();
+    if (contact.lud16 != null) {
+      maybeArrow = const Icon(Icons.arrow_forward);
+    }
     return AppCard(
       padding: const EdgeInsets.fromLTRB(23.0, 16.0, 23.0, 15.0),
       child: Row(
@@ -83,7 +90,7 @@ class ContactWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
               "https://imgproxy.iris.to/insecure/plain/${contact.picture}",
-              width: 60,
+              height: 60,
               errorBuilder: (context, error, stackTrace) => Image.network(
                 "https://robohash.org/kwinten",
                 width: 60,
@@ -104,29 +111,17 @@ class ContactWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  getSecondRow(contact),
+                  Text(
+                    contact.lud16 ?? "",
+                    style: const TextStyle(fontSize: 13),
+                  ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 16.0),
-          const Icon(Icons.arrow_forward)
+          maybeArrow,
         ],
-      ),
-    );
-  }
-
-  String extractHost(String lnAddress) {
-    return lnAddress.replaceAll(RegExp(".*@"), "");
-  }
-
-  getSecondRow(Profile contact) {
-    return Text(
-      //todo
-      extractHost(contact.lud16 ?? contact.lud16!),
-      style: const TextStyle(
-        fontSize: 13.0,
-        fontWeight: FontWeight.bold,
       ),
     );
   }

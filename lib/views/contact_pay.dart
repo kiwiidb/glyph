@@ -64,7 +64,7 @@ class ContactPayView extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                extractHost(contact.lud16!),
+                                "⚡ ${contact.lud16 ?? ""} ",
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,

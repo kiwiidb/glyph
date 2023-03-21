@@ -29,7 +29,7 @@ class _BottomNavigationDotBarState extends State<BottomNavigationDotBar> {
   }
 
   _afterLayout(_) {
-    _color = widget.color ?? Colors.black45;
+    _color = Colors.black45;
   }
 
   @override

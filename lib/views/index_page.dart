@@ -5,6 +5,7 @@ import 'package:glyph/views/contact_overview.dart';
 import '../constants/colors.dart';
 import '../controllers/wrapper_controller.dart';
 import 'navigation/my_bottom_navigation_bar.dart';
+import 'profile_settings_view.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
@@ -32,13 +33,11 @@ class IndexPage extends StatelessWidget {
               s.onItemTapped(page);
             },
             controller: s.pageController,
-            itemCount: 4,
+            itemCount: 2,
             itemBuilder: (BuildContext context, int index) {
               return [
                 ContactOverView(),
-                ContactOverView(),
-                ContactOverView(),
-                ContactOverView()
+                ProfileSettingsView(),
               ][index];
             },
           ),

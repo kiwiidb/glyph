@@ -35,13 +35,17 @@ class NostrControlller extends GetxController {
 
   @override
   void onInit() async {
-    // Chnnecting to a nostr relay using websocket
+    //todo: init from nsec
+    //so we can use nostr-wallet-connect
+    //and we can more easily re-use this codebase
+    //var kc = Keychain("r");
     for (String relay in defaultRelays) {
       try {
         WebSocket ws = await WebSocket.connect(relay);
         startListenLoop(ws);
         await Future.delayed(const Duration(seconds: 1));
         fetchNostrFollows(ws, authController.pubkey.value);
+        fetchProfile(ws, authController.pubkey.value);
       } catch (e) {
         Get.snackbar(
             "Something went wrong", "error ${e.toString()}, relay $relay");
@@ -77,7 +81,11 @@ class NostrControlller extends GetxController {
               jsonDecode(parsedMsg.content) as Map<String, dynamic>;
           Profile prf = Profile.fromJson(parsedProfile);
           prf.pubkey = parsedMsg.pubkey;
-          if (prf.lud16 != null && prf.pubkey != null && prf.name != null) {
+          if (prf.pubkey == authController.pubkey.value) {
+            authController.profile.value = prf;
+            return;
+          }
+          if (prf.pubkey != null && prf.name != null) {
             contactPageController.storeContact(prf);
           }
         }
