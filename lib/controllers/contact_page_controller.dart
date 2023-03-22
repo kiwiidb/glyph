@@ -29,7 +29,6 @@ class ContactPageController extends GetxController {
       },
     );
     await fetchContacts();
-    shownContacts.addAll(contacts);
     super.onInit();
   }
 
@@ -38,12 +37,14 @@ class ContactPageController extends GetxController {
     for (String key in keys) {
       Map<String, dynamic> cJson = contactBox.read(key);
       contacts[key] = Profile.fromJson(cJson);
+      shownContacts[key] = Profile.fromJson(cJson);
     }
   }
 
   Future<void> storeContact(Profile c) async {
     await contactBox.write(c.pubkey!, c);
     contacts[c.pubkey!] = c;
+    shownContacts[c.pubkey!] = c;
   }
 
   deleteContact(Profile value) async {

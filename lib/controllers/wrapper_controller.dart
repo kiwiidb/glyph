@@ -14,7 +14,7 @@ class WrapperController extends GetxController {
   @override
   void onInit() async {
     var rate = await lnUrlPayService.getRate();
-    priceString.value = "${rate.code} ${rate.rateFloat!.floor()}";
+    priceString.value = "📈 ${rate.rateFloat!.floor()}";
     moscowTimeString.value = "🕑 ${(1e8 / rate.rateFloat!).floor()}";
     currentDisplayString.value = priceString.value;
     super.onInit();

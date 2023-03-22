@@ -40,9 +40,14 @@ class ContactOverView extends StatelessWidget {
                   shrinkWrap: true,
                   primary: false,
                   padding: EdgeInsets.zero,
-                  itemCount: controller.shownContacts.length,
+                  itemCount: controller.shownContacts.length + 1,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
+                    if (i == controller.shownContacts.length) {
+                      return const SizedBox(
+                        height: 30,
+                      );
+                    }
                     String key = controller.shownContacts.keys.elementAt(i);
                     Profile contact = controller.contacts[key]!;
                     return InkWell(

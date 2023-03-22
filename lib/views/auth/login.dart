@@ -32,9 +32,9 @@ class LoginPage extends StatelessWidget {
                         children: <Widget>[
                           const SizedBox(height: 40.0),
                           LabeledTextFormField(
-                            label: "Nostr public key:",
-                            controller: authController.pubkeyController,
-                            hintText: "npub123456",
+                            label: "Nostr private key:",
+                            controller: authController.privkeyController,
+                            hintText: "nsec123456",
                             keyboardType: TextInputType.emailAddress,
                           ),
                           const Spacer(),
@@ -42,7 +42,7 @@ class LoginPage extends StatelessWidget {
                           GradientButton(
                             onPressed: () {
                               authController
-                                  .login(authController.pubkeyController.text);
+                                  .login(authController.privkeyController.text);
                             },
                             text: "continue".tr,
                           ),
