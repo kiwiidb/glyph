@@ -2,20 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:convert/convert.dart';
-import 'package:dart_bech32/dart_bech32.dart';
 import 'package:glyph/controllers/auth_controller.dart';
 import 'package:glyph/controllers/contact_page_controller.dart';
-import 'package:glyph/models/bitcoin_transaction.dart';
-import 'package:glyph/models/utxo.dart';
-import 'package:glyph/views/inscription_list.dart';
-import 'package:http/http.dart' as http;
+import 'package:glyph/models/nostr_profile.dart' as nostr_models;
 import 'package:nostr/nostr.dart';
-
-import '../models/nostr_profile.dart';
 
 class NostrControlller extends GetxController {
   final AuthController authController = Get.put(AuthController());
@@ -25,6 +16,8 @@ class NostrControlller extends GetxController {
   static const _chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   static final Random _rnd = Random();
+  static const String walletPubkey = "123hex";
+  late WebSocket walletRelay;
   static const defaultRelays = [
     "wss://relay.damus.io",
     "wss://eden.nostr.land",
@@ -35,13 +28,12 @@ class NostrControlller extends GetxController {
 
   @override
   void onInit() async {
-    //todo: init from nsec
-    //so we can use nostr-wallet-connect
-    //and we can more easily re-use this codebase
-    //var kc = Keychain("r");
     for (String relay in defaultRelays) {
       try {
         WebSocket ws = await WebSocket.connect(relay);
+        if (relay == "wss://relay.damus.io") {
+          walletRelay = ws;
+        }
         startListenLoop(ws);
         await Future.delayed(const Duration(seconds: 1));
         fetchNostrFollows(ws, authController.pubkey.value);
@@ -79,7 +71,8 @@ class NostrControlller extends GetxController {
         if (parsedMsg.kind == 0) {
           var parsedProfile =
               jsonDecode(parsedMsg.content) as Map<String, dynamic>;
-          Profile prf = Profile.fromJson(parsedProfile);
+          nostr_models.Profile prf =
+              nostr_models.Profile.fromJson(parsedProfile);
           prf.pubkey = parsedMsg.pubkey;
           if (prf.pubkey == authController.pubkey.value) {
             authController.profile.value = prf;
@@ -89,8 +82,24 @@ class NostrControlller extends GetxController {
             contactPageController.storeContact(prf);
           }
         }
+        if (parsedMsg.kind == 23195) {
+          Get.snackbar("Succesfully sent payment!", "🚀",
+              snackPosition: SnackPosition.TOP);
+        }
+        if (parsedMsg.kind == 23196) {
+          Get.snackbar("Error sending payment", "😥",
+              snackPosition: SnackPosition.TOP);
+        }
       }
     });
+  }
+
+  void sendZap(String bolt11) async {
+    var event = Event.partial();
+    event.kind = 23194;
+    event.createdAt = currentUnixTimestampSeconds();
+    var recipient = ["p", walletPubkey];
+    event.tags = <List<String>>[recipient];
   }
 
   void fetchProfile(WebSocket ws, String pubkey) async {

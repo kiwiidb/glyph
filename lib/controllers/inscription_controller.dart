@@ -12,12 +12,13 @@ import 'package:glyph/models/utxo.dart';
 import 'package:glyph/views/inscription_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:nostr/nostr.dart';
+import 'package:glyph/models/nostr_profile.dart' as nostr_models;
 
 import '../models/nostr_profile.dart';
 
 class InscriptionControlller extends GetxController {
   var utxos = List<Utxo>.empty().obs;
-  var contacts = <String, Profile>{}.obs;
+  var contacts = <String, nostr_models.Profile>{}.obs;
   var loading = true.obs;
   static const _chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';

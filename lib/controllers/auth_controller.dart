@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:nostr/nostr.dart';
 
-import '../models/nostr_profile.dart';
+import '../models/nostr_profile.dart' as nostr_models;
 
 class AuthController extends GetxController with WidgetsBindingObserver {
   final TextEditingController pubkeyController = TextEditingController();
@@ -18,7 +18,7 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   var pubkey = "".obs;
   var npub = "".obs;
   var isLoading = false.obs;
-  var profile = Profile().obs;
+  var profile = nostr_models.Profile().obs;
   late Keychain keychain;
   GetStorage accountStorage = GetStorage("identity");
 
