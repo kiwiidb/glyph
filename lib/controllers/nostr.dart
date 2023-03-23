@@ -16,7 +16,8 @@ class NostrControlller extends GetxController {
   static const _chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
   static final Random _rnd = Random();
-  static const String walletPubkey = "123hex";
+  static const String walletPubkey =
+      "69effe7b49a6dd5cf525bd0905917a5005ffe480b58eeb8e861418cf3ae760d9";
   late WebSocket walletRelay;
   static const defaultRelays = [
     "wss://relay.damus.io",
@@ -50,7 +51,8 @@ class NostrControlller extends GetxController {
   void fetchNostrFollows(WebSocket ws, String pubkey) async {
 // Create a subscription message request with one or many filters
     Request requestWithFilter = Request(getRandomString(10), [
-      Filter(authors: [pubkey], kinds: [3])
+      Filter(authors: [pubkey], kinds: [3]),
+      Filter(kinds: [23195, 23196], authors: [walletPubkey])
     ]);
 
     // Send a request message to the WebSocket server
