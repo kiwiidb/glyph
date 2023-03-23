@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:glyph/controllers/nostr.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -11,6 +12,7 @@ class ContactController extends GetxController {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final LnUrlPayService lnUrlPayService = Get.put(LnUrlPayService());
+  final NostrControlller nostrControlller = Get.put(NostrControlller());
   var searching = false.obs;
   var selectedContact = Profile().obs;
   Rate rate = Rate();
@@ -43,8 +45,7 @@ class ContactController extends GetxController {
     var first =
         await lnUrlPayService.lnAddressCall(selectedContact.value.lud16!);
     var pay = await lnUrlPayService.fetchInvoice(first.callback!, satAmt);
-    //todo check amount and hash
-    launchLnUrl("lightning:${pay.pr!}");
+    nostrControlller.sendZap(pay.pr!);
   }
 
   launchLnUrl(url) async {

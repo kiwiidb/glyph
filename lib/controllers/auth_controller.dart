@@ -32,6 +32,10 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     if (pk != "" && pk != null) {
       this.npub.value = npub;
     }
+    var privkeyhex = await accountStorage.read("identity-privkey-hex");
+    if (privkeyhex != "" && privkeyhex != null) {
+      keychain = Keychain(privkeyhex);
+    }
     super.onInit();
   }
 

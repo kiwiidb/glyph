@@ -47,6 +47,8 @@ dependencies:
   get_storage: ^2.1.1
   url_launcher:  ^6.0.0-nullsafety
   flutter_speed_dial: ^6.2.0
+  kepler: ^1.0.3
+  cryptography: ^2.5.0
 
 dev_dependencies:
   flutter_test:

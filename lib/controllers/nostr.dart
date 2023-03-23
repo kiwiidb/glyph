@@ -1,12 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:convert/convert.dart';
+import 'package:cryptography/cryptography.dart';
 
 import 'package:get/get.dart';
 import 'package:glyph/controllers/auth_controller.dart';
 import 'package:glyph/controllers/contact_page_controller.dart';
 import 'package:glyph/models/nostr_profile.dart' as nostr_models;
+import 'package:kepler/kepler.dart';
 import 'package:nostr/nostr.dart';
+import 'package:pointycastle/ecc/api.dart';
+import 'package:pointycastle/ecc/curves/secp256k1.dart';
 
 class NostrControlller extends GetxController {
   final AuthController authController = Get.put(AuthController());
@@ -44,8 +49,25 @@ class NostrControlller extends GetxController {
             "Something went wrong", "error ${e.toString()}, relay $relay");
       }
     }
-
     super.onInit();
+  }
+
+  Future<String> nip04Encrypt(String payload, String pk, String sk) async {
+    var ourPrivkey = createECPrivatekey(sk);
+    var theirPubkey = createECPubkey(pk);
+    final message = utf8.encode(payload);
+    // AES-CBC with 128 bit keys and HMAC-SHA256 authentication.
+    final algorithm = AesCbc.with256bits(
+      macAlgorithm: Hmac.sha256(),
+    );
+    final secretIV = Kepler.byteSecret(Kepler.strinifyPrivateKey(ourPrivkey),
+        Kepler.strinifyPublicKey(theirPubkey));
+    final secretKey = await algorithm.newSecretKeyFromBytes(secretIV[0]);
+    algorithm.newSecretKey();
+    final nonce = algorithm.newNonce();
+    final secretBox =
+        await algorithm.encrypt(message, secretKey: secretKey, nonce: nonce);
+    return "${base64.encode(secretBox.cipherText)}?iv=${base64.encode(nonce)}";
   }
 
   void fetchNostrFollows(WebSocket ws, String pubkey) async {
@@ -100,8 +122,15 @@ class NostrControlller extends GetxController {
     var event = Event.partial();
     event.kind = 23194;
     event.createdAt = currentUnixTimestampSeconds();
+    event.pubkey = authController.keychain.public;
     var recipient = ["p", walletPubkey];
     event.tags = <List<String>>[recipient];
+    var encryptedPayload = await nip04Encrypt(
+        bolt11, walletPubkey, authController.keychain.private);
+    event.content = encryptedPayload;
+    event.id = event.getEventId();
+    event.sig = event.getSignature(authController.keychain.private);
+    walletRelay.add(event.serialize());
   }
 
   void fetchProfile(WebSocket ws, String pubkey) async {
@@ -115,4 +144,45 @@ class NostrControlller extends GetxController {
 
   String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
       length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
+}
+
+ECPrivateKey createECPrivatekey(String hexprivkey) {
+  BigInt d0 = BigInt.parse(hexprivkey, radix: 16);
+  if ((d0 < BigInt.one) || (d0 > (secp256k1.n - BigInt.one))) {
+    throw Error();
+  }
+  return ECPrivateKey(d0, ECCurve_secp256k1());
+}
+
+//here we paste in random fiatjaf code and hope it works
+ECPublicKey createECPubkey(String hexpubkey) {
+  // turn public key into a point (we only get y, but we find out the y)
+  BigInt x = bigFromBytes(hex.decode(hexpubkey.padLeft(64, '0')));
+  BigInt y;
+  y = liftX(x);
+  var point = secp256k1.curve.createPoint(x, y);
+  return ECPublicKey(point, ECCurve_secp256k1());
+}
+
+var secp256k1 = ECDomainParameters("secp256k1");
+var curveP = BigInt.parse(
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F',
+    radix: 16);
+
+// helper methods:
+// liftX returns Y for this X
+BigInt liftX(BigInt x) {
+  if (x >= curveP) {
+    throw new Error();
+  }
+  var ySq = (x.modPow(BigInt.from(3), curveP) + BigInt.from(7)) % curveP;
+  var y = ySq.modPow((curveP + BigInt.one) ~/ BigInt.from(4), curveP);
+  if (y.modPow(BigInt.two, curveP) != ySq) {
+    throw new Error();
+  }
+  return y % BigInt.two == BigInt.zero /* even */ ? y : curveP - y;
+}
+
+BigInt bigFromBytes(List<int> bytes) {
+  return BigInt.parse(hex.encode(bytes), radix: 16);
 }
